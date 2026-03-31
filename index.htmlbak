@@ -10,8 +10,7 @@
     margin: 0;
     font-family: "Trebuchet MS", system-ui, sans-serif;
     background: radial-gradient(circle at top, #5a2a82, #3b1a5c, #2a1242);
-    height: 100dvh;
-	padding-bottom: env(safe-area-inset-bottom);
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
