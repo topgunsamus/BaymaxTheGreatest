@@ -2,414 +2,477 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<title>Baymax Fortune Machine</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Baymax The Great!</title>
-
 <style>
+  :root {
+    --bg: radial-gradient(circle at top, #2b2b4f 0, #0a0a12 45%, #000000 100%);
+    --card-bg: rgba(15, 15, 30, 0.9);
+    --accent: #ff66cc;
+    --accent-soft: #ff9ee6;
+    --text-main: #ffffff;
+    --text-soft: #d0d0ff;
+    --border-glow: 0 0 20px rgba(255, 102, 204, 0.6);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
   body {
     margin: 0;
-    font-family: "Trebuchet MS", system-ui, sans-serif;
-    background: radial-gradient(circle at top, #5a2a82, #3b1a5c, #2a1242);
-    height: 100dvh;
-	padding-bottom: env(safe-area-inset-bottom);
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text-main);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #f3d9ff;
-    overflow: hidden;
+    padding: 20px;
+    overflow-x: hidden;
   }
 
   .wrapper {
-    text-align: center;
-    position: relative;
-    z-index: 10;
+    max-width: 900px;
     width: 100%;
-    max-width: 420px;
-    padding: 0 1rem;
+    background: linear-gradient(145deg, rgba(20, 20, 40, 0.95), rgba(10, 10, 25, 0.98));
+    border-radius: 24px;
+    padding: 24px 20px 28px;
+    box-shadow:
+      0 0 40px rgba(0, 0, 0, 0.8),
+      0 0 60px rgba(255, 102, 204, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .wrapper::before,
+  .wrapper::after {
+    content: "";
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 102, 204, 0.18), transparent 70%);
+    filter: blur(2px);
+    z-index: 0;
+  }
+
+  .wrapper::before {
+    top: -80px;
+    left: -60px;
+  }
+
+  .wrapper::after {
+    bottom: -100px;
+    right: -40px;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  #baymax {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.7);
+    box-shadow:
+      0 0 25px rgba(255, 255, 255, 0.4),
+      0 0 40px rgba(255, 102, 204, 0.4);
+    background: #000;
+  }
+
+  .title-block {
+    text-align: left;
+    max-width: 480px;
   }
 
   h1 {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-    text-shadow: 0 0 12px rgba(255,255,255,0.7);
+    margin: 0;
+    font-size: 1.9rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-shadow:
+      0 0 12px rgba(255, 255, 255, 0.7),
+      0 0 22px rgba(255, 102, 204, 0.7);
   }
 
-  .cat-container {
-    position: relative;
-    width: 70vw;
-    max-width: 260px;
-    height: 70vw;
-    max-height: 260px;
-    margin: 0 auto 1.2rem;
+  .subtitle {
+    margin-top: 6px;
+    font-size: 0.95rem;
+    color: var(--text-soft);
   }
 
-  .cat {
-    width: 100%;
-    height: 100%;
-    background-image: url('baymax.png');
-    background-size: cover;
-    background-position: center;
-    border-radius: 12px;
-    filter: drop-shadow(0 0 18px rgba(200,150,255,0.9));
-    box-shadow: 0 0 25px rgba(180,120,255,0.4);
+  .fortune-card {
+    margin-top: 18px;
+    background: var(--card-bg);
+    border-radius: 18px;
+    padding: 18px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.7);
   }
 
-  .paw-btn {
-    width: 22vw;
-    height: 22vw;
-    max-width: 110px;
-    max-height: 110px;
-    background-image: url('pawprint.png');
-    background-size: cover;
-    image-rendering: pixelated;
-    cursor: pointer;
-    margin: 0 auto 1.2rem;
-    transition: transform 0.15s ease;
-    filter: drop-shadow(0 0 10px rgba(255,255,255,0.9));
+  .fortune-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--accent-soft);
+    margin-bottom: 8px;
   }
-
-  .paw-btn:active { transform: scale(0.9); }
 
   .fortune {
-    min-height: 40px;
-    max-width: 90%;
-    margin: 0.5rem auto 0;
-    padding: 0.8rem 1rem;
-    background: rgba(255,255,255,0.12);
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.35);
-    opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 0.22s ease, transform 0.22s ease;
-    backdrop-filter: blur(4px);
-    text-align: center;
-    font-size: 1rem;
-    line-height: 1.35;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    color: #fdfdff;
+    min-height: 3.2em;
   }
 
-  .fortune.show {
-    opacity: 1;
-    transform: translateY(0);
+  .controls {
+    margin-top: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
   }
 
-  /* RARITY COLORS */
-  .fortune.common { color: #ffffff; }
-  .fortune.uncommon { color: #7CFF7C; text-shadow: 0 0 6px rgba(124,255,124,0.6); }
-  .fortune.rare { color: #6EC6FF; text-shadow: 0 0 8px rgba(110,198,255,0.8); }
-  .fortune.ultra { color: #ffb347; text-shadow: 0 0 12px rgba(255,179,71,1); }
-
-  /* BIG Magical Pixel Dust */
-  .particle {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    background: white;
-    image-rendering: pixelated;
-    border-radius: 3px;
-    opacity: 0.95;
-    pointer-events: none;
-    filter: drop-shadow(0 0 8px white);
-    animation: floatBurst 1.4s ease-out forwards;
+  #fortuneButton {
+    padding: 14px 32px;
+    font-size: 1.05rem;
+    border-radius: 999px;
+    border: none;
+    background: radial-gradient(circle at top left, #ff9ee6, #ff66cc);
+    color: #1a0010;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow:
+      0 0 18px rgba(255, 102, 204, 0.7),
+      0 0 30px rgba(255, 255, 255, 0.4);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
   }
 
-  @keyframes floatBurst {
-    0% { transform: translate(0, 0) scale(1.4); opacity: 1; }
-    60% { opacity: 1; }
-    100% { transform: translate(var(--x-move), var(--y-move)) scale(0.4); opacity: 0; }
+  #fortuneButton:active {
+    transform: scale(0.96);
+    box-shadow:
+      0 0 10px rgba(255, 102, 204, 0.6),
+      0 0 18px rgba(255, 255, 255, 0.3);
+    filter: brightness(0.96);
   }
 
-  /* Star Rain */
-  .star {
-    position: fixed;
-    top: -20px;
-    width: 10px;
-    height: 10px;
-    background: #ffeaff;
-    border-radius: 50%;
-    image-rendering: pixelated;
-    filter: drop-shadow(0 0 6px #ffd6ff);
-    opacity: 0.9;
-    animation: fall linear forwards;
+  .hint {
+    font-size: 0.8rem;
+    color: rgba(220, 220, 255, 0.7);
   }
 
-  @keyframes fall {
-    0% { transform: translateY(0) scale(1); opacity: 1; }
-    100% { transform: translateY(110vh) scale(0.4); opacity: 0; }
-  }
-
-  /* EXPLODING CONFETTI */
-  .confetti {
-    position: fixed;
-    width: 12px;
-    height: 16px;
-    background: pink;
-    opacity: 0.9;
-    pointer-events: none;
-    border-radius: 2px;
-    filter: drop-shadow(0 0 6px rgba(255,200,255,0.8));
-    animation: confettiExplode 2.4s ease-out forwards;
-  }
-
-  @keyframes confettiExplode {
-    0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-    100% { transform: translate(var(--x-move), var(--y-move)) rotate(var(--spin)); opacity: 0; }
-  }
-
-  /* Ultra Rare Fireworks */
-  .firework {
+  .sparkle {
     position: fixed;
     width: 8px;
     height: 8px;
-    background: #ffd6ff;
     border-radius: 50%;
     pointer-events: none;
-    animation: fireworkFall 1.2s ease-out forwards;
-    filter: drop-shadow(0 0 8px #ffbaff);
+    animation: sparkleAnim 1s ease-out forwards;
+    mix-blend-mode: screen;
   }
 
-  @keyframes fireworkFall {
-    0% { transform: translateY(0) scale(1); opacity: 1; }
-    100% { transform: translateY(100vh) scale(0.2); opacity: 0; }
+  @keyframes sparkleAnim {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: 1;
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate3d(0, -60px, 0) scale(0);
+      opacity: 0;
+    }
   }
 
-  /* ULTRA RARE SCREEN FLASH */
-  .screen-flash {
+  .flash {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(255, 180, 50, 0.8);
+    inset: 0;
+    background: radial-gradient(circle at center, #ffffff, #ffd6f5, #ff9ee6);
+    opacity: 0.85;
+    animation: flashAnim 0.7s ease-out forwards;
     pointer-events: none;
-    z-index: 9999;
-    animation: flashFade 0.6s ease-out forwards;
+    mix-blend-mode: screen;
   }
 
-  @keyframes flashFade {
-    0% { opacity: 1; }
-    100% { opacity: 0; }
+  @keyframes flashAnim {
+    from {
+      opacity: 0.85;
+    }
+    to {
+      opacity: 0;
+    }
   }
 
-  /* DEV FLASH */
-  @keyframes devFlash {
-    0% { opacity: 1; }
-    100% { opacity: 0; }
-  }
+  @media (max-width: 600px) {
+    .wrapper {
+      padding: 18px 14px 22px;
+      border-radius: 20px;
+    }
 
-  @media (max-width: 480px) {
-    h1 { font-size: 1.5rem; }
-    .fortune { font-size: 0.95rem; }
+    header {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .title-block {
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+    }
+
+    .fortune {
+      font-size: 1.05rem;
+    }
+
+    #baymax {
+      width: 96px;
+      height: 96px;
+    }
   }
 </style>
 </head>
-
 <body>
 
 <div class="wrapper">
-  <h1>🌙 Ask Baymax the Great! 🌙</h1>
+  <div class="content">
+    <header>
+      <img id="baymax" src="baymax.png" alt="Baymax" />
+      <div class="title-block">
+        <h1>Baymax Fortune Machine</h1>
+        <div class="subtitle">
+          One pull per day… unless Baymax secretly blesses you with more.
+        </div>
+      </div>
+    </header>
 
-  <div class="cat-container">
-    <div class="cat"></div>
-  </div>
+    <div class="fortune-card">
+      <div class="fortune-label">Today's Fortune</div>
+      <div class="fortune"></div>
+    </div>
 
-  <div class="paw-btn" id="pawBtn"></div>
-
-  <div class="fortune" id="fortuneBox">
-    Press the pawprint to know your future..
+    <div class="controls">
+      <button id="fortuneButton">Reveal My Fortune</button>
+      <div class="hint">
+        (Triple-tap anywhere to reset for testing)
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-  let fortunes = [];
+/* ---------------------------------------------------------
+   GLOBAL STATE
+--------------------------------------------------------- */
+let fortunes = [];
+let bonusDay = null;
 
-  fetch("fortunes.json")
-    .then(r => r.json())
-    .then(data => fortunes = data.fortunes);
+/* ---------------------------------------------------------
+   LOAD FORTUNES FROM fortunes.json
+--------------------------------------------------------- */
+async function loadFortunes() {
+  try {
+    const res = await fetch("fortunes.json");
+    const data = await res.json();
+    fortunes = data.fortunes.map((f, i) => ({
+      id: i + 1,
+      ...f
+    }));
+  } catch (e) {
+    console.error("Error loading fortunes.json", e);
+  }
+}
 
-  function canGetFortuneToday() {
-    const last = localStorage.getItem("lastFortuneDate");
-    const today = new Date().toDateString();
-    if (last === today) return false;
-    localStorage.setItem("lastFortuneDate", today);
-    return true;
+loadFortunes();
+
+/* ---------------------------------------------------------
+   LOAD BONUS DAY FROM bonus.json
+--------------------------------------------------------- */
+async function loadBonusDay() {
+  try {
+    const res = await fetch("bonus.json");
+    const data = await res.json();
+    bonusDay = data.bonusDay;
+  } catch (e) {
+    console.error("bonus.json missing or invalid");
+  }
+}
+
+loadBonusDay();
+
+/* ---------------------------------------------------------
+   DATE HELPERS
+--------------------------------------------------------- */
+function todayString() {
+  return new Date().toISOString().split("T")[0];
+}
+
+function isToday(dateString) {
+  return todayString() === dateString;
+}
+
+/* ---------------------------------------------------------
+   BONUS SYSTEM
+--------------------------------------------------------- */
+function resetBonusIfNewDay() {
+  const today = todayString();
+  const last = localStorage.getItem("bonusLastCheck");
+
+  if (today !== last) {
+    localStorage.removeItem("bonusUsed");
+    localStorage.setItem("bonusLastCheck", today);
+  }
+}
+
+resetBonusIfNewDay();
+
+function tryBonusFortune() {
+  if (!bonusDay || bonusDay === "none") return false;
+  if (!isToday(bonusDay)) return false;
+  if (localStorage.getItem("bonusUsed") === "true") return false;
+
+  localStorage.setItem("bonusUsed", "true");
+  return true;
+}
+
+/* ---------------------------------------------------------
+   NO DUPLICATE SYSTEM
+--------------------------------------------------------- */
+function getUsedFortunes() {
+  return JSON.parse(localStorage.getItem("usedFortunes") || "[]");
+}
+
+function saveUsedFortune(id) {
+  const used = getUsedFortunes();
+  used.push(id);
+  localStorage.setItem("usedFortunes", JSON.stringify(used));
+}
+
+/* ---------------------------------------------------------
+   WEIGHTED RANDOM PICK
+--------------------------------------------------------- */
+function getWeightedFortune() {
+  const used = getUsedFortunes();
+  const available = fortunes.filter(f => !used.includes(f.id));
+
+  if (available.length === 0) {
+    localStorage.removeItem("usedFortunes");
+    return {
+      text: "You've seen every fortune! The universe quietly reshuffles the deck for you…",
+      rarity: "rare",
+      weight: 1
+    };
   }
 
-  /* SECRET DEV TRIPLE‑TAP (TOP‑RIGHT CORNER) */
-  let tapCount = 0;
-  let tapTimeout;
+  const total = available.reduce((sum, f) => sum + f.weight, 0);
+  let r = Math.random() * total;
 
-  document.addEventListener("touchstart", (e) => {
-    const touch = e.touches[0];
-    const x = touch.clientX;
-    const y = touch.clientY;
-
-    if (x > window.innerWidth - 80 && y < 80) {
-      tapCount++;
-
-      clearTimeout(tapTimeout);
-      tapTimeout = setTimeout(() => tapCount = 0, 500);
-
-      if (tapCount === 3) {
-        tapCount = 0;
-        localStorage.removeItem("lastFortuneDate");
-        console.log("%cDeveloper Reset Activated (Triple Tap)", "color:#ffb3ff; font-size:16px;");
-
-        const flash = document.createElement("div");
-        flash.style.position = "fixed";
-        flash.style.top = 0;
-        flash.style.left = 0;
-        flash.style.width = "100vw";
-        flash.style.height = "100vh";
-        flash.style.background = "rgba(255,255,255,0.3)";
-        flash.style.zIndex = 99999;
-        flash.style.pointerEvents = "none";
-        flash.style.animation = "devFlash 0.4s ease-out forwards";
-        document.body.appendChild(flash);
-        setTimeout(() => flash.remove(), 400);
-      }
-    }
-  });
-
-  function getWeightedFortune() {
-    const total = fortunes.reduce((sum, f) => sum + f.weight, 0);
-    let r = Math.random() * total;
-    for (const f of fortunes) {
-      if (r < f.weight) return f;
-      r -= f.weight;
-    }
-    return fortunes[0];
+  for (const f of available) {
+    if (r < f.weight) return f;
+    r -= f.weight;
   }
 
-  /* SPARKLE BURST BASED ON RARITY */
-  function createPixelDust(x, y, rarity = "common") {
-    let colors;
+  return available[0];
+}
 
-    if (rarity === "common") {
-      colors = ["#ffffff", "#eaeaea", "#dcdcdc"];
-    } else if (rarity === "uncommon") {
-      colors = ["#7CFF7C", "#b0ffb0", "#d6ffd6"];
-    } else if (rarity === "rare") {
-      colors = ["#6EC6FF", "#a8e0ff", "#d0f0ff"];
-    } else if (rarity === "ultra") {
-      colors = ["#ffb347", "#ffd197", "#ffe3c2"];
-    }
+/* ---------------------------------------------------------
+   SPARKLES + FLASH
+--------------------------------------------------------- */
+function spawnSparkles(color) {
+  for (let i = 0; i < 22; i++) {
+    const s = document.createElement("div");
+    s.className = "sparkle";
+    s.style.background = color;
 
-    for (let i = 0; i < 40; i++) {
-      const p = document.createElement("div");
-      p.classList.add("particle");
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 40 + Math.random() * 120;
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
 
-      p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    s.style.left = centerX + Math.cos(angle) * radius + "px";
+    s.style.top = centerY + Math.sin(angle) * radius + "px";
 
-      p.style.left = x + "px";
-      p.style.top = y + "px";
-
-      const angle = Math.random() * Math.PI * 2;
-      const distance = 120 + Math.random() * 200;
-
-      const xMove = Math.cos(angle) * distance;
-      const yMove = Math.sin(angle) * distance - 80;
-
-      p.style.setProperty("--x-move", `${xMove}px`);
-      p.style.setProperty("--y-move", `${yMove}px`);
-
-      document.body.appendChild(p);
-      setTimeout(() => p.remove(), 1500);
-    }
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 1000);
   }
+}
 
-  function createConfetti() {
-    const originX = window.innerWidth / 2;
-    const originY = window.innerHeight / 3;
+function flashScreen() {
+  const f = document.createElement("div");
+  f.className = "flash";
+  document.body.appendChild(f);
+  setTimeout(() => f.remove(), 700);
+}
 
-    for (let i = 0; i < 60; i++) {
-      const c = document.createElement("div");
-      c.classList.add("confetti");
+/* ---------------------------------------------------------
+   MAIN BUTTON LOGIC
+--------------------------------------------------------- */
+const fortuneEl = document.querySelector(".fortune");
+const buttonEl = document.getElementById("fortuneButton");
 
-      const colors = ["#ff9fff", "#d28bff", "#ffb3ff"];
-      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+buttonEl.addEventListener("click", () => {
+  if (!fortunes.length) return;
 
-      c.style.left = originX + "px";
-      c.style.top = originY + "px";
-
-      const angle = Math.random() * Math.PI * 2;
-      const distance = 200 + Math.random() * 200;
-
-      const xMove = Math.cos(angle) * distance;
-      const yMove = Math.sin(angle) * distance + 300;
-
-      c.style.setProperty("--x-move", `${xMove}px`);
-      c.style.setProperty("--y-move", `${yMove}px`);
-
-      const spin = (Math.random() * 720 - 360) + "deg";
-      c.style.setProperty("--spin", spin);
-
-      document.body.appendChild(c);
-      setTimeout(() => c.remove(), 2500);
-    }
-  }
-
-  function createFireworks() {
-    for (let i = 0; i < 60; i++) {
-      const f = document.createElement("div");
-      f.classList.add("firework");
-      f.style.left = Math.random() * 100 + "vw";
-      f.style.background = ["#ffd6ff", "#ffbaff", "#ffe6ff"][Math.floor(Math.random()*3)];
-      document.body.appendChild(f);
-      setTimeout(() => f.remove(), 1200);
-    }
-  }
-
-  function screenFlash() {
-    const flash = document.createElement("div");
-    flash.classList.add("screen-flash");
-    document.body.appendChild(flash);
-    setTimeout(() => flash.remove(), 600);
-  }
-
-  function spawnStar() {
-    const star = document.createElement("div");
-    star.classList.add("star");
-    star.style.left = Math.random() * 100 + "vw";
-    star.style.animationDuration = 3 + Math.random() * 4 + "s";
-    document.body.appendChild(star);
-    setTimeout(() => star.remove(), 7000);
-  }
-  setInterval(spawnStar, 200);
-
-  const pawBtn = document.getElementById("pawBtn");
-  const fortuneBox = document.getElementById("fortuneBox");
-
-  pawBtn.addEventListener("click", (e) => {
-    if (!canGetFortuneToday()) {
-      fortuneBox.className = "fortune show common";
-      fortuneBox.textContent = "You have already received your magical fortune today. Return tomorrow.";
-      return;
-    }
-
-    const rect = pawBtn.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-
+  /* --- BONUS DRAW --- */
+  if (tryBonusFortune()) {
     const fortune = getWeightedFortune();
+    fortuneEl.textContent =
+      "✨ Baymax has blessed you with an additional draw today! ✨\n\n" + fortune.text;
 
-    createPixelDust(x, y, fortune.rarity);
+    saveUsedFortune(fortune.id);
 
-    if (fortune.rarity === "rare") createConfetti();
-    if (fortune.rarity === "ultra") {
-      createConfetti();
-      createFireworks();
-      screenFlash();
-    }
+    flashScreen();
+    spawnSparkles("#ff00ff");
 
-    fortuneBox.classList.remove("show");
-    setTimeout(() => {
-      fortuneBox.textContent = fortune.text;
-      fortuneBox.className = "fortune show " + fortune.rarity;
-    }, 150);
-  });
+    return;
+  }
 
-  setTimeout(() => fortuneBox.classList.add("show"), 200);
+  /* --- NORMAL DRAW --- */
+  const fortune = getWeightedFortune();
+  fortuneEl.textContent = fortune.text;
+
+  saveUsedFortune(fortune.id);
+
+  if (fortune.rarity === "common") spawnSparkles("#ffffff");
+  if (fortune.rarity === "uncommon") spawnSparkles("#4cff4c");
+  if (fortune.rarity === "rare") spawnSparkles("#4cbaff");
+  if (fortune.rarity === "ultra") {
+    spawnSparkles("#ff8800");
+    flashScreen();
+  }
+});
+
+/* ---------------------------------------------------------
+   TRIPLE TAP DEV RESET
+--------------------------------------------------------- */
+let tapCount = 0;
+document.body.addEventListener("click", () => {
+  tapCount++;
+  setTimeout(() => (tapCount = 0), 600);
+  if (tapCount >= 3) {
+    localStorage.clear();
+    alert("Dev reset complete!");
+  }
+});
 </script>
-
 </body>
 </html>
