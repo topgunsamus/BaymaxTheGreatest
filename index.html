@@ -201,6 +201,34 @@
     h1 { font-size: 1.5rem; }
     .fortune { font-size: 0.95rem; }
   }
+  /* BONUS FLOATING BANNER */
+.bonus-banner {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 220, 255, 0.25);
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  color: #ffeaff;
+  text-shadow: 0 0 8px #ffbaff;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 18px rgba(255, 180, 255, 0.8);
+  opacity: 0;
+  animation: bannerFloat 3.2s ease-out forwards;
+  z-index: 99999;
+}
+
+@keyframes bannerFloat {
+  0% { opacity: 0; transform: translate(-50%, -20px); }
+  10% { opacity: 1; transform: translate(-50%, 0); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+  
+  
+  
 </style>
 </head>
 
@@ -384,10 +412,11 @@ function canDrawToday() {
   }
 
   // Bonus day → allow ONE extra draw
-  if (isBonusDay() && !bonusUsed) {
-    localStorage.setItem("bonusUsed", "true");
-    return true;
-  }
+if (isBonusDay() && !localStorage.getItem("bonusUsed")) {
+  showBonusBanner();
+}
+
+
 
   // Otherwise → no more draws
   return false;
@@ -400,6 +429,15 @@ function applyBonusGlow() {
   if (isBonusDay()) {
     document.getElementById("cat").classList.add("bonus-glow");
   }
+}
+
+function showBonusBanner() {
+  const banner = document.createElement("div");
+  banner.className = "bonus-banner";
+  banner.textContent = "✨ Baymax has blessed you with a bonus fortune today! Meow ✨";
+  document.body.appendChild(banner);
+
+  setTimeout(() => banner.remove(), 3500);
 }
 
 /* ---------------------------------------------------------
