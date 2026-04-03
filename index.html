@@ -487,12 +487,26 @@ pawBtn.addEventListener("click", () => {
     showBonusBanner();
   }
 });
-
+// Invisible dev-mode tap to reset daily + bonus lock
+document.getElementById("devTapZone").addEventListener("click", () => {
+  localStorage.removeItem("lastDrawDate");
+  localStorage.removeItem("bonusUsed");
+  console.log("Dev reset: daily lock + bonus lock cleared");
+});
 /* ---------------------------------------------------------
    INITIALIZE
 --------------------------------------------------------- */
 setTimeout(() => fortuneBox.classList.add("show"), 200);
 </script>
 <div class="version-tag">v1.0.1 April 2nd</div>
+<div id="devTapZone" style="
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  z-index: 999999;
+  opacity: 0;
+"></div>
 </body>
 </html>
