@@ -222,84 +222,7 @@
 
 <script>
 /* ---------------------------------------------------------
-   LOAD FORTUNES + BONUS DAY
---------------------------------------------------------- */
-let fortunes = [];
-let bonusDay = null;
-
-Promise.all([
-  fetch("fortunes.json").then(r => r.json()),
-  fetch("bonus.json").then(r => r.json()).catch(() => ({ bonusDay: null }))
-]).then(([fortuneData, bonusData]) => {
-  fortunes = fortuneData.fortunes;
-  bonusDay = bonusData.bonusDay;
-});
-
-/* ---------------------------------------------------------
-   NO-DUPLICATE SYSTEM
---------------------------------------------------------- */
-function getUsedFortunes() {
-  return JSON.parse(localStorage.getItem("usedFortunes") || "[]");
-}
-
-function saveUsedFortunes(arr) {
-  localStorage.setItem("usedFortunes", JSON.stringify(arr));
-}
-
-function getUnusedFortunes() {
-  const used = getUsedFortunes();
-  return fortunes.filter(f => !used.includes(f.id));
-}
-
-function drawUniqueFortune() {
-  let unused = getUnusedFortunes();
-
-  if (unused.length === 0) {
-    saveUsedFortunes([]);
-    unused = fortunes;
-  }
-
-  const total = unused.reduce((sum, f) => sum + f.weight, 0);
-  let r = Math.random() * total;
-
-  for (const f of unused) {
-    if (r < f.weight) return f;
-    r -= f.weight;
-  }
-  return unused[0];
-}
-
-/* ---------------------------------------------------------
-   DAILY LIMIT + BONUS DAY
---------------------------------------------------------- */
-function isBonusDay() {
-  const today = new Date().toISOString().split("T")[0];
-  return today === bonusDay;
-}
-
-function canDrawToday() {
-  const today = new Date().toDateString();
-  const last = localStorage.getItem("lastDrawDate");
-
-  if (isBonusDay()) return true;
-
-  if (last === today) return false;
-
-  localStorage.setItem("lastDrawDate", today);
-  return true;
-}
-
-/* ---------------------------------------------------------
-   BONUS GLOW
---------------------------------------------------------- */
-function applyBonusGlow() {
-  if (isBonusDay()) {
-    document.getElementById("cat").classList.add("bonus-glow");
-  }
-}
-
-/* ---------------------------------------------------------
-   ANIMATIONS (unchanged)
+   ANIMATION FUNCTIONS — MUST COME FIRST
 --------------------------------------------------------- */
 function createPixelDust(x, y, rarity = "common") {
   let colors;
@@ -392,6 +315,84 @@ function spawnStar() {
 setInterval(spawnStar, 200);
 
 /* ---------------------------------------------------------
+   LOAD FORTUNES + BONUS DAY
+--------------------------------------------------------- */
+let fortunes = [];
+let bonusDay = null;
+
+Promise.all([
+  fetch("fortunes.json").then(r => r.json()),
+  fetch("bonus.json").then(r => r.json()).catch(() => ({ bonusDay: null }))
+]).then(([fortuneData, bonusData]) => {
+  fortunes = fortuneData.fortunes;
+  bonusDay = bonusData.bonusDay;
+  applyBonusGlow();
+});
+
+/* ---------------------------------------------------------
+   NO-DUPLICATE SYSTEM
+--------------------------------------------------------- */
+function getUsedFortunes() {
+  return JSON.parse(localStorage.getItem("usedFortunes") || "[]");
+}
+
+function saveUsedFortunes(arr) {
+  localStorage.setItem("usedFortunes", JSON.stringify(arr));
+}
+
+function getUnusedFortunes() {
+  const used = getUsedFortunes();
+  return fortunes.filter(f => !used.includes(f.id));
+}
+
+function drawUniqueFortune() {
+  let unused = getUnusedFortunes();
+
+  if (unused.length === 0) {
+    saveUsedFortunes([]);
+    unused = fortunes;
+  }
+
+  const total = unused.reduce((sum, f) => sum + f.weight, 0);
+  let r = Math.random() * total;
+
+  for (const f of unused) {
+    if (r < f.weight) return f;
+    r -= f.weight;
+  }
+  return unused[0];
+}
+
+/* ---------------------------------------------------------
+   DAILY LIMIT + BONUS DAY
+--------------------------------------------------------- */
+function isBonusDay() {
+  const today = new Date().toISOString().split("T")[0];
+  return today === bonusDay;
+}
+
+function canDrawToday() {
+  const today = new Date().toDateString();
+  const last = localStorage.getItem("lastDrawDate");
+
+  if (isBonusDay()) return true;
+
+  if (last === today) return false;
+
+  localStorage.setItem("lastDrawDate", today);
+  return true;
+}
+
+/* ---------------------------------------------------------
+   BONUS GLOW
+--------------------------------------------------------- */
+function applyBonusGlow() {
+  if (isBonusDay()) {
+    document.getElementById("cat").classList.add("bonus-glow");
+  }
+}
+
+/* ---------------------------------------------------------
    MAIN DRAW LOGIC
 --------------------------------------------------------- */
 const pawBtn = document.getElementById("pawBtn");
@@ -440,7 +441,6 @@ pawBtn.addEventListener("click", () => {
    INITIALIZE
 --------------------------------------------------------- */
 setTimeout(() => fortuneBox.classList.add("show"), 200);
-applyBonusGlow();
 </script>
 
 </body>

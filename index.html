@@ -367,7 +367,7 @@ function drawUniqueFortune() {
    DAILY LIMIT + BONUS DAY
 --------------------------------------------------------- */
 function isBonusDay() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toLocaleDateString("en-CA"); 
   return today === bonusDay;
 }
 
