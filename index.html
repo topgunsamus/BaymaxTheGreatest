@@ -220,6 +220,20 @@
     h1 { font-size: 1.5rem; }
     .fortune { font-size: 0.95rem; }
   }
+  
+  .version-tag {
+  position: fixed;
+  bottom: 6px;
+  right: 8px;
+  font-size: 0.65rem;
+  opacity: 0.35;
+  color: #ffffff;
+  pointer-events: none;
+  user-select: none;
+  z-index: 9999;
+}
+  
+  
 </style>
 </head>
 
@@ -479,6 +493,6 @@ pawBtn.addEventListener("click", () => {
 --------------------------------------------------------- */
 setTimeout(() => fortuneBox.classList.add("show"), 200);
 </script>
-
+<div class="version-tag">v1.0.1 April 2nd</div>
 </body>
 </html>
