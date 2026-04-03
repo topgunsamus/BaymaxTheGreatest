@@ -478,12 +478,8 @@ pawBtn.addEventListener("click", () => {
     fortuneBox.className = "fortune show " + fortune.rarity;
   }, 150);
 
-  if (isBonusDay()) {
-    setTimeout(() => {
-      fortuneBox.textContent += "\n\n✨ Baymax has blessed you with an extra draw today! ✨";
-    }, 300);
   }
-});
+);
 
 /* ---------------------------------------------------------
    INITIALIZE
