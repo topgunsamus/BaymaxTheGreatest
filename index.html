@@ -216,24 +216,29 @@
     100% { opacity: 0; transform: translate(-50%, -20px); }
   }
 
+  /* DEV FLASH */
+  @keyframes devFlash {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* VERSION TAG */
+  .version-tag {
+    position: fixed;
+    bottom: 6px;
+    right: 8px;
+    font-size: 0.65rem;
+    opacity: 0.35;
+    color: #ffffff;
+    pointer-events: none;
+    user-select: none;
+    z-index: 9999;
+  }
+
   @media (max-width: 480px) {
     h1 { font-size: 1.5rem; }
     .fortune { font-size: 0.95rem; }
   }
-  
-  .version-tag {
-  position: fixed;
-  bottom: 6px;
-  right: 8px;
-  font-size: 0.65rem;
-  opacity: 0.35;
-  color: #ffffff;
-  pointer-events: none;
-  user-select: none;
-  z-index: 9999;
-}
-  
-  
 </style>
 </head>
 
@@ -252,6 +257,20 @@
     Press the pawprint to know your future..
   </div>
 </div>
+
+<!-- Invisible dev tap zone -->
+<div id="devTapZone" style="
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  opacity: 0;
+  z-index: 999999;
+"></div>
+
+<!-- Version tag -->
+<div class="version-tag">v1.0.2 April 2</div>
 
 <script>
 /* ---------------------------------------------------------
@@ -353,7 +372,7 @@ setInterval(spawnStar, 200);
 function showBonusBanner() {
   const banner = document.createElement("div");
   banner.className = "bonus-banner";
-  banner.textContent = "✨ Baymax has blessed you with a bonus fortune today! Click the pawprint for another fortune. Meow! ✨";
+  banner.textContent = "✨ Baymax has blessed you with a bonus fortune today! Meow ✨";
   document.body.appendChild(banner);
 
   setTimeout(() => banner.remove(), 3500);
@@ -482,31 +501,51 @@ pawBtn.addEventListener("click", () => {
     fortuneBox.className = "fortune show " + fortune.rarity;
   }, 150);
 
-  // Floating banner ONLY on first draw of bonus day
   if (isBonusDay() && !localStorage.getItem("bonusUsed")) {
     showBonusBanner();
   }
 });
-// Invisible dev-mode tap to reset daily + bonus lock
-document.getElementById("devTapZone").addEventListener("click", () => {
-  localStorage.removeItem("lastDrawDate");
-  localStorage.removeItem("bonusUsed");
-  console.log("Dev reset: daily lock + bonus lock cleared");
+
+/* ---------------------------------------------------------
+   INVISIBLE DEV MODE — TRIPLE TAP TOP RIGHT
+--------------------------------------------------------- */
+let devTapCount = 0;
+let devTapTimer = null;
+
+document.getElementById("devTapZone").addEventListener("touchstart", () => {
+  devTapCount++;
+
+  clearTimeout(devTapTimer);
+  devTapTimer = setTimeout(() => devTapCount = 0, 500);
+
+  if (devTapCount === 3) {
+    devTapCount = 0;
+
+    localStorage.removeItem("lastDrawDate");
+    localStorage.removeItem("bonusUsed");
+
+    console.log("%cDEV RESET: Daily + Bonus lock cleared", "color:#ffb3ff; font-size:14px;");
+
+    const flash = document.createElement("div");
+    flash.style.position = "fixed";
+    flash.style.top = 0;
+    flash.style.left = 0;
+    flash.style.width = "100vw";
+    flash.style.height = "100vh";
+    flash.style.background = "rgba(255,255,255,0.25)";
+    flash.style.pointerEvents = "none";
+    flash.style.zIndex = 999998;
+    flash.style.animation = "devFlash 0.35s ease-out forwards";
+    document.body.appendChild(flash);
+    setTimeout(() => flash.remove(), 350);
+  }
 });
+
 /* ---------------------------------------------------------
    INITIALIZE
 --------------------------------------------------------- */
 setTimeout(() => fortuneBox.classList.add("show"), 200);
 </script>
-<div class="version-tag">v1.0.1 April 2nd</div>
-<div id="devTapZone" style="
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 60px;
-  height: 60px;
-  z-index: 999999;
-  opacity: 0;
-"></div>
+
 </body>
 </html>
