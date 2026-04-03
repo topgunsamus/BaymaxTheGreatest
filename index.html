@@ -52,57 +52,13 @@
     border-radius: 12px;
     filter: drop-shadow(0 0 18px rgba(200,150,255,0.9));
     box-shadow: 0 0 25px rgba(180,120,255,0.4);
+    transition: filter 0.4s ease, box-shadow 0.4s ease;
   }
 
-  /* BONUS-DAY GLOW + SPARKLES */
+  /* BONUS DAY GLOW */
   .cat.bonus-glow {
-    position: relative;
-    box-shadow:
-      0 0 25px rgba(255, 210, 255, 0.9),
-      0 0 45px rgba(255, 160, 255, 0.7),
-      0 0 70px rgba(255, 140, 255, 0.5);
-    animation: bonusPulse 2s ease-in-out infinite;
-  }
-
-  @keyframes bonusPulse {
-    0% {
-      transform: scale(1);
-      filter: drop-shadow(0 0 18px rgba(200,150,255,0.9));
-    }
-    50% {
-      transform: scale(1.02);
-      filter: drop-shadow(0 0 26px rgba(255,200,255,1));
-    }
-    100% {
-      transform: scale(1);
-      filter: drop-shadow(0 0 18px rgba(200,150,255,0.9));
-    }
-  }
-
-  .bonus-sparkle {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: radial-gradient(circle, #ffe6ff, #ffb3ff);
-    border-radius: 50%;
-    pointer-events: none;
-    opacity: 0;
-    filter: drop-shadow(0 0 6px #ffd6ff);
-    animation: bonusSparkle 2.4s ease-out forwards;
-  }
-
-  @keyframes bonusSparkle {
-    0% {
-      transform: translate3d(0, 0, 0) scale(0.6);
-      opacity: 0;
-    }
-    20% {
-      opacity: 1;
-    }
-    100% {
-      transform: translate3d(var(--sx), var(--sy), 0) scale(0);
-      opacity: 0;
-    }
+    filter: drop-shadow(0 0 28px rgba(255,200,255,1));
+    box-shadow: 0 0 40px rgba(255,180,255,0.9);
   }
 
   .paw-btn {
@@ -241,25 +197,20 @@
     100% { opacity: 0; }
   }
 
-  /* DEV FLASH */
-  @keyframes devFlash {
-    0% { opacity: 1; }
-    100% { opacity: 0; }
-  }
-
   @media (max-width: 480px) {
     h1 { font-size: 1.5rem; }
     .fortune { font-size: 0.95rem; }
   }
 </style>
 </head>
+
 <body>
 
 <div class="wrapper">
   <h1>🌙 Ask Baymax the Great! 🌙</h1>
 
   <div class="cat-container">
-    <div class="cat" id="baymaxCat"></div>
+    <div class="cat" id="cat"></div>
   </div>
 
   <div class="paw-btn" id="pawBtn"></div>
@@ -270,276 +221,226 @@
 </div>
 
 <script>
-  /* ---------------------------------------------------------
-     GLOBAL STATE
-  --------------------------------------------------------- */
-  let fortunes = [];
-  let bonusDay = null;
+/* ---------------------------------------------------------
+   ANIMATION FUNCTIONS — MUST COME FIRST
+--------------------------------------------------------- */
+function createPixelDust(x, y, rarity = "common") {
+  let colors;
 
-  /* ---------------------------------------------------------
-     LOAD FORTUNES (assign IDs for no-duplicate system)
-  --------------------------------------------------------- */
-  fetch("fortunes.json")
-    .then(r => r.json())
-    .then(data => {
-      fortunes = data.fortunes.map((f, i) => ({
-        id: i + 1,
-        ...f
-      }));
-    });
+  if (rarity === "common") colors = ["#ffffff", "#eaeaea", "#dcdcdc"];
+  else if (rarity === "uncommon") colors = ["#7CFF7C", "#b0ffb0", "#d6ffd6"];
+  else if (rarity === "rare") colors = ["#6EC6FF", "#a8e0ff", "#d0f0ff"];
+  else if (rarity === "ultra") colors = ["#ffb347", "#ffd197", "#ffe3c2"];
 
-  /* ---------------------------------------------------------
-     LOAD BONUS DAY
-  --------------------------------------------------------- */
-  function loadBonusDay() {
-    fetch("bonus.json")
-      .then(r => r.json())
-      .then(data => {
-        bonusDay = data.bonusDay;
-        applyBonusVisualsIfNeeded();
-      })
-      .catch(() => {
-        bonusDay = null;
-      });
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement("div");
+    p.classList.add("particle");
+
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+    p.style.left = x + "px";
+    p.style.top = y + "px";
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 120 + Math.random() * 200;
+
+    const xMove = Math.cos(angle) * distance;
+    const yMove = Math.sin(angle) * distance - 80;
+
+    p.style.setProperty("--x-move", `${xMove}px`);
+    p.style.setProperty("--y-move", `${yMove}px`);
+
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1500);
   }
-  loadBonusDay();
+}
 
-  /* ---------------------------------------------------------
-     DATE HELPERS
-  --------------------------------------------------------- */
-  function todayString() {
-    return new Date().toISOString().split("T")[0];
+function createConfetti() {
+  const originX = window.innerWidth / 2;
+  const originY = window.innerHeight / 3;
+
+  for (let i = 0; i < 60; i++) {
+    const c = document.createElement("div");
+    c.classList.add("confetti");
+
+    const colors = ["#ff9fff", "#d28bff", "#ffb3ff"];
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+    c.style.left = originX + "px";
+    c.style.top = originY + "px";
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 200 + Math.random() * 200;
+
+    const xMove = Math.cos(angle) * distance;
+    const yMove = Math.sin(angle) * distance + 300;
+
+    c.style.setProperty("--x-move", `${xMove}px`);
+    c.style.setProperty("--y-move", `${yMove}px`);
+
+    const spin = (Math.random() * 720 - 360) + "deg";
+    c.style.setProperty("--spin", spin);
+
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 2500);
   }
+}
 
-  function isToday(dateStr) {
-    return dateStr === todayString();
+function createFireworks() {
+  for (let i = 0; i < 60; i++) {
+    const f = document.createElement("div");
+    f.classList.add("firework");
+    f.style.left = Math.random() * 100 + "vw";
+    f.style.background = ["#ffd6ff", "#ffbaff", "#ffe6ff"][Math.floor(Math.random()*3)];
+    document.body.appendChild(f);
+    setTimeout(() => f.remove(), 1200);
   }
+}
 
-  /* ---------------------------------------------------------
-     BONUS SYSTEM STORAGE
-  --------------------------------------------------------- */
-  function resetBonusIfNewDay() {
-    const today = todayString();
-    const last = localStorage.getItem("bonusLastCheck");
+function screenFlash() {
+  const flash = document.createElement("div");
+  flash.classList.add("screen-flash");
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 600);
+}
 
-    if (today !== last) {
-      localStorage.removeItem("bonusUsed");
-      localStorage.setItem("bonusLastCheck", today);
-    }
-  }
-  resetBonusIfNewDay();
+function spawnStar() {
+  const star = document.createElement("div");
+  star.classList.add("star");
+  star.style.left = Math.random() * 100 + "vw";
+  star.style.animationDuration = 3 + Math.random() * 4 + "s";
+  document.body.appendChild(star);
+  setTimeout(() => star.remove(), 7000);
+}
+setInterval(spawnStar, 200);
 
-  function tryBonusFortune() {
-    if (!bonusDay || bonusDay === "none") return false;
-    if (!isToday(bonusDay)) return false;
-    if (localStorage.getItem("bonusUsed") === "true") return false;
+/* ---------------------------------------------------------
+   LOAD FORTUNES + BONUS DAY
+--------------------------------------------------------- */
+let fortunes = [];
+let bonusDay = null;
 
-    localStorage.setItem("bonusUsed", "true");
-    return true;
-  }
+Promise.all([
+  fetch("fortunes.json").then(r => r.json()),
+  fetch("bonus.json").then(r => r.json()).catch(() => ({ bonusDay: null }))
+]).then(([fortuneData, bonusData]) => {
+  fortunes = fortuneData.fortunes;
+  bonusDay = bonusData.bonusDay;
+  applyBonusGlow();
+});
 
-  /* ---------------------------------------------------------
-     NO-DUPLICATE SYSTEM
-  --------------------------------------------------------- */
-  function getUsedFortunes() {
-    return JSON.parse(localStorage.getItem("usedFortunes") || "[]");
-  }
+/* ---------------------------------------------------------
+   NO-DUPLICATE SYSTEM
+--------------------------------------------------------- */
+function getUsedFortunes() {
+  return JSON.parse(localStorage.getItem("usedFortunes") || "[]");
+}
 
-  function saveUsedFortune(id) {
-    const used = getUsedFortunes();
-    used.push(id);
-    localStorage.setItem("usedFortunes", JSON.stringify(used));
-  }
+function saveUsedFortunes(arr) {
+  localStorage.setItem("usedFortunes", JSON.stringify(arr));
+}
 
-  /* ---------------------------------------------------------
-     WEIGHTED PICK WITH NO DUPLICATES
-  --------------------------------------------------------- */
-  function getWeightedFortune() {
-    const used = getUsedFortunes();
-    const available = fortunes.filter(f => !used.includes(f.id));
+function getUnusedFortunes() {
+  const used = getUsedFortunes();
+  return fortunes.filter(f => !used.includes(f.id));
+}
 
-    if (available.length === 0) {
-      localStorage.removeItem("usedFortunes");
-      return {
-        text: "You have uncovered every prophecy. The universe quietly reshuffles the deck...",
-        rarity: "rare",
-        weight: 1
-      };
-    }
+function drawUniqueFortune() {
+  let unused = getUnusedFortunes();
 
-    const total = available.reduce((sum, f) => sum + f.weight, 0);
-    let r = Math.random() * total;
-
-    for (const f of available) {
-      if (r < f.weight) return f;
-      r -= f.weight;
-    }
-
-    return available[0];
-  }
-
-  /* ---------------------------------------------------------
-     BONUS-DAY VISUALS (Glow + Sparkles)
-  --------------------------------------------------------- */
-  function applyBonusVisualsIfNeeded() {
-    if (!bonusDay || !isToday(bonusDay)) return;
-
-    const cat = document.getElementById("baymaxCat");
-    cat.classList.add("bonus-glow");
-
-    startBonusSparkles();
-  }
-
-  function startBonusSparkles() {
-    const container = document.querySelector(".cat-container");
-
-    setInterval(() => {
-      const s = document.createElement("div");
-      s.classList.add("bonus-sparkle");
-
-      const x = Math.random() * container.clientWidth;
-      const y = Math.random() * container.clientHeight;
-
-      s.style.left = x + "px";
-      s.style.top = y + "px";
-
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 40 + Math.random() * 60;
-
-      s.style.setProperty("--sx", Math.cos(angle) * dist + "px");
-      s.style.setProperty("--sy", Math.sin(angle) * dist + "px");
-
-      container.appendChild(s);
-      setTimeout(() => s.remove(), 2400);
-    }, 900);
-  }
-    /* ---------------------------------------------------------
-     STAR RAIN (your original)
-  --------------------------------------------------------- */
-  function spawnStar() {
-    const star = document.createElement("div");
-    star.classList.add("star");
-    star.style.left = Math.random() * 100 + "vw";
-    star.style.animationDuration = 3 + Math.random() * 4 + "s";
-    document.body.appendChild(star);
-    setTimeout(() => star.remove(), 7000);
-  }
-  setInterval(spawnStar, 200);
-
-  /* ---------------------------------------------------------
-     ORIGINAL DAILY LIMIT
-  --------------------------------------------------------- */
-  function canGetFortuneToday() {
-    const last = localStorage.getItem("lastFortuneDate");
-    const today = new Date().toDateString();
-    if (last === today) return false;
-    localStorage.setItem("lastFortuneDate", today);
-    return true;
+  if (unused.length === 0) {
+    saveUsedFortunes([]);
+    unused = fortunes;
   }
 
-  /* ---------------------------------------------------------
-     TRIPLE TAP DEV RESET (unchanged)
-  --------------------------------------------------------- */
-  let tapCount = 0;
-  let tapTimeout;
+  const total = unused.reduce((sum, f) => sum + f.weight, 0);
+  let r = Math.random() * total;
 
-  document.addEventListener("touchstart", (e) => {
-    const touch = e.touches[0];
-    const x = touch.clientX;
-    const y = touch.clientY;
+  for (const f of unused) {
+    if (r < f.weight) return f;
+    r -= f.weight;
+  }
+  return unused[0];
+}
 
-    if (x > window.innerWidth - 80 && y < 80) {
-      tapCount++;
+/* ---------------------------------------------------------
+   DAILY LIMIT + BONUS DAY
+--------------------------------------------------------- */
+function isBonusDay() {
+  const today = new Date().toISOString().split("T")[0];
+  return today === bonusDay;
+}
 
-      clearTimeout(tapTimeout);
-      tapTimeout = setTimeout(() => tapCount = 0, 500);
+function canDrawToday() {
+  const today = new Date().toDateString();
+  const last = localStorage.getItem("lastDrawDate");
 
-      if (tapCount === 3) {
-        tapCount = 0;
-        localStorage.clear();
+  if (isBonusDay()) return true;
 
-        const flash = document.createElement("div");
-        flash.style.position = "fixed";
-        flash.style.top = 0;
-        flash.style.left = 0;
-        flash.style.width = "100vw";
-        flash.style.height = "100vh";
-        flash.style.background = "rgba(255,255,255,0.3)";
-        flash.style.zIndex = 99999;
-        flash.style.pointerEvents = "none";
-        flash.style.animation = "devFlash 0.4s ease-out forwards";
-        document.body.appendChild(flash);
-        setTimeout(() => flash.remove(), 400);
-      }
-    }
-  });
+  if (last === today) return false;
 
-  /* ---------------------------------------------------------
-     MAIN BUTTON LOGIC
-  --------------------------------------------------------- */
-  const pawBtn = document.getElementById("pawBtn");
-  const fortuneBox = document.getElementById("fortuneBox");
+  localStorage.setItem("lastDrawDate", today);
+  return true;
+}
 
-  pawBtn.addEventListener("click", () => {
-    const rect = pawBtn.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
+/* ---------------------------------------------------------
+   BONUS GLOW
+--------------------------------------------------------- */
+function applyBonusGlow() {
+  if (isBonusDay()) {
+    document.getElementById("cat").classList.add("bonus-glow");
+  }
+}
 
-    /* -----------------------------------------------------
-       BONUS DRAW (bypasses daily limit, still no duplicates)
-    ----------------------------------------------------- */
-    if (tryBonusFortune()) {
-      const f = getWeightedFortune();
-      saveUsedFortune(f.id);
+/* ---------------------------------------------------------
+   MAIN DRAW LOGIC
+--------------------------------------------------------- */
+const pawBtn = document.getElementById("pawBtn");
+const fortuneBox = document.getElementById("fortuneBox");
 
-      createPixelDust(x, y, f.rarity);
-      createConfetti();
-      screenFlash();
+pawBtn.addEventListener("click", () => {
+  if (!canDrawToday()) {
+    fortuneBox.className = "fortune show common";
+    fortuneBox.textContent = "You have already received your magical fortune today. Return tomorrow.";
+    return;
+  }
 
-      fortuneBox.classList.remove("show");
-      setTimeout(() => {
-        fortuneBox.textContent =
-          "✨ Baymax has blessed you with an additional draw today! ✨\n\n" +
-          f.text;
-        fortuneBox.className = "fortune show " + f.rarity;
-      }, 150);
+  const rect = pawBtn.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
 
-      return;
-    }
+  const fortune = drawUniqueFortune();
 
-    /* -----------------------------------------------------
-       NORMAL DAILY DRAW
-    ----------------------------------------------------- */
-    if (!canGetFortuneToday()) {
-      fortuneBox.className = "fortune show common";
-      fortuneBox.textContent =
-        "You have already received your magical fortune today. Return tomorrow.";
-      return;
-    }
+  const used = getUsedFortunes();
+  used.push(fortune.id);
+  saveUsedFortunes(used);
 
-    const fortune = getWeightedFortune();
-    saveUsedFortune(fortune.id);
+  createPixelDust(x, y, fortune.rarity);
 
-    createPixelDust(x, y, fortune.rarity);
+  if (fortune.rarity === "rare") createConfetti();
+  if (fortune.rarity === "ultra") {
+    createConfetti();
+    createFireworks();
+    screenFlash();
+  }
 
-    if (fortune.rarity === "rare") createConfetti();
-    if (fortune.rarity === "ultra") {
-      createConfetti();
-      createFireworks();
-      screenFlash();
-    }
+  fortuneBox.classList.remove("show");
+  setTimeout(() => {
+    fortuneBox.textContent = fortune.text;
+    fortuneBox.className = "fortune show " + fortune.rarity;
+  }, 150);
 
-    fortuneBox.classList.remove("show");
+  if (isBonusDay()) {
     setTimeout(() => {
-      fortuneBox.textContent = fortune.text;
-      fortuneBox.className = "fortune show " + fortune.rarity;
-    }, 150);
-  });
+      fortuneBox.textContent += "\n\n✨ Baymax has blessed you with an extra draw today! ✨";
+    }, 300);
+  }
+});
 
-  /* ---------------------------------------------------------
-     INITIAL FADE-IN
-  --------------------------------------------------------- */
-  setTimeout(() => fortuneBox.classList.add("show"), 200);
+/* ---------------------------------------------------------
+   INITIALIZE
+--------------------------------------------------------- */
+setTimeout(() => fortuneBox.classList.add("show"), 200);
 </script>
 
 </body>
